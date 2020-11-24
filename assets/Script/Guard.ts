@@ -7,17 +7,66 @@
 
 const {ccclass, property} = cc._decorator;
 
+import {KLIPS} from './config/Klips';
+
 @ccclass
 export class Guard extends cc.Component {
 
+    /*
     @property(cc.Label)
     label: cc.Label = null;
 
     @property
     text: string = 'hello';
+    */
+
+    private _speed: number;
+
+    private animSt: cc.AnimationState;
 
     private animationComponent: cc.Animation;
 
+    private _guardState: string;
+
+    /**
+     * get walking speed
+     */
+    public get speed(): number {
+        return this._speed;
+    }
+
+    public get guardState(): string{
+        return this._guardState;
+    }
+
+    /**
+     * setGuardState
+     */
+    public set guardState(s: string) {
+        this._guardState = s;
+        switch(this._guardState){
+            case ('patrolling'):{
+                this.animSt = this.animationComponent.play(KLIPS.guard_patrol_klip);
+                this.animSt.wrapMode = cc.WrapMode.Loop;
+                break;
+            }
+            case ('shooting'):{
+                this.animSt = this.animationComponent.play(KLIPS.guard_shoot_klip);
+                this.animSt.wrapMode = cc.WrapMode.Normal;
+                //let _this = this;
+                break;
+            }
+            case ('dying'):{
+                this.animationComponent.play(KLIPS.guard_death_klip);
+                break;
+            }
+
+            default: {
+                break;
+            }
+        }
+        
+    }
     /**
      * addclips
      */
@@ -33,7 +82,8 @@ export class Guard extends cc.Component {
         
             this.animationComponent.addClip(clip);
         }
-        this.animationComponent.play('guard_patrol_fr');
+        this.animationComponent.play(KLIPS.guard_patrol_klip);
+        this.guardState ='patrolling';
         
         
     }
@@ -42,9 +92,14 @@ export class Guard extends cc.Component {
 
     onLoad () {
         this.animationComponent = this.node.addComponent(cc.Animation);
+        //this._speed = 1.3;
     }
 
-    // start () {}
+    start () {
+        this.animSt = null;
+        this._speed = 1.3;
+        this._guardState = '';
+    }
 
     // update (dt) {}
 }

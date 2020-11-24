@@ -31,7 +31,7 @@ export  class KLIPS extends cc.Component {
     public static hero_entry_img = 'Hero starting walk';
     public static hero_idle_img = 'Hero idle';
     public static hero_walk_img = 'Hero walk';
-    public static hero_accessing_pod_img = 'Accessing_pod';
+    public static hero_accessing_pod_img = 'Accessing pod';
     public static hero_death_by_bullet_img = 'Death by bullet';
     public static hero_death_through_laser_img = 'Death through laser';
 

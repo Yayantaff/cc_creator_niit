@@ -32,7 +32,7 @@ export class SlideDoor extends cc.Component {
 
     public set slideDoorOpen(t: boolean) {
         this._slideDoorOpen = t;
-        this.node.dispatchEvent( new cc.Event.EventCustom('TPod2', true) );
+        //this.node.dispatchEvent( new cc.Event.EventCustom('TPod2', true) );
         //this.animationComponent.setCurrentTime(0);
         //this.animationComponent.stop();
         if (this._slideDoorOpen){

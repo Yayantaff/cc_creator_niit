@@ -6807,7 +6807,8 @@ declare namespace cc {
 	 - resume : 恢复播放时
 	 - lastframe : 假如动画循环次数大于 1，当动画播放到最后一帧时
 	 - finished : 动画播放完成时 */
-	export class Animation extends Component implements EventTarget {		
+	export class Animation extends Component implements EventTarget {
+        [x: string]: any;		
 		/** !#en Animation will play the default clip when start game.
 		!#zh 在勾选自动播放或调用 play() 时默认播放的动画剪辑。 */
 		defaultClip: AnimationClip;		

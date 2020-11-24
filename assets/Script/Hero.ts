@@ -73,12 +73,12 @@ export class Hero extends cc.Component {
 
     */
 
-    public getHeroState(): string {
+    public get heroState(): string {
         return this._heroState;
     
     }
 
-    public setHeroState(s: string){
+    public set heroState(s: string){
         
         this._heroState = s;
 
@@ -98,6 +98,11 @@ export class Hero extends cc.Component {
             case ('operating'):{
                 this.animSt = this.animationComponent.play(KLIPS.hero_accessing_pod_klip);
                 this.animSt.wrapMode = cc.WrapMode.Normal;
+                let _this = this;
+                this.animationComponent.scheduleOnce(function(){ // workaround, no animationcomplete callbacks in API.
+                    _this.heroState = 'idling' ;
+                },1);
+                console.log('HERO OPERATING ', this._heroState);
                 break;
             }
 
@@ -130,17 +135,19 @@ export class Hero extends cc.Component {
             this.animationComponent.addClip(clip);
         }
         //this.animationComponent.play(KLIPS.hero_idle_klip);
-        this.setHeroState('idling');
+        this.heroState = 'idling';
         
         return;
     }
 
-    addEventListeners() {
+    /*addEventListeners() {
         this.node.on(CustomEvents.POD_SLIDE_DOOR_EVENT, function(event){
             this.inLocomotion = false;
             this.isOperating = true;
         },this)
-    }
+
+        
+    }*/
 
     // LIFE-CYCLE CALLBACKS:
 
@@ -148,11 +155,16 @@ export class Hero extends cc.Component {
         //this._isOperating = false;//this._inLocomotion = false;//false;
         this.animationComponent = this.node.addComponent(cc.Animation);
         //this.setHeroState('idling');
-        this._speed = 2;
+        //this._speed = 2;
         
     }
 
-    // start () {}
+    start () {
+        this._speed = 2;
+        this.heroState = ''; // workaround for the animation clips loading latency issue. Unless _herostate is changed from empty to 'idling', 
+                              // which happens after clips are loaded in addclips function, update function in game class won't play any clips 
+                              // now.
+    }
 
     // update (dt) {}
 }

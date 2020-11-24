@@ -10,7 +10,7 @@ const {ccclass, property} = cc._decorator;
 @ccclass
 export class CustomEvents extends cc.Component {
 
-    public static POD_LASER_DOOR_EVENT = 'TPOD2';
-    public static POD_SLIDE_DOOR_EVENT = 'TPOD1';
+    public static POD_LASER_DOOR_EVENT = 'TPod2';
+    public static POD_SLIDE_DOOR_EVENT = 'TPod1';
     
 }

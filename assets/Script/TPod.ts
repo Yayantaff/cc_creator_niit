@@ -25,12 +25,12 @@ export class TPod extends cc.Component {
     /** accessors
      * isEnabled is true, if hero is in suffient proximity to the switch.
      */
-    get isEnabled(): boolean {
+    public get isEnabled(): boolean {
         return this._isEnabled;
         
     }
 
-    set isEnabled(operable: boolean){
+    public set isEnabled(operable: boolean){
         this._isEnabled = operable;
     }
 
@@ -62,6 +62,7 @@ export class TPod extends cc.Component {
     onLoad () {
         this.node.on(cc.Node.EventType.MOUSE_UP, function(event){
         //if(this._isEnabled)
+        if(this.node.getComponent(cc.Button).enabled)
             this.node.dispatchEvent( new cc.Event.EventCustom(this.node.name, true) );
         
         },this)
