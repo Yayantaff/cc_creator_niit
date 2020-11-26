@@ -114,7 +114,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 1300,
-      "height": 202
+      "height": 200
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -126,7 +126,7 @@
       "ctor": "Float64Array",
       "array": [
         650,
-        101,
+        100,
         0,
         0,
         0,
@@ -1167,9 +1167,9 @@
     "_designResolution": {
       "__type__": "cc.Size",
       "width": 1300,
-      "height": 202
+      "height": 200
     },
-    "_fitWidth": false,
+    "_fitWidth": true,
     "_fitHeight": false,
     "_id": "a1PW3/hyFOvbU+obPyHRgT"
   },

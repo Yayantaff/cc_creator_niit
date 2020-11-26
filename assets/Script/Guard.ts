@@ -22,6 +22,8 @@ export class Guard extends cc.Component {
 
     private _speed: number;
 
+    private _dir: number;
+
     private animSt: cc.AnimationState;
 
     private animationComponent: cc.Animation;
@@ -34,6 +36,21 @@ export class Guard extends cc.Component {
     public get speed(): number {
         return this._speed;
     }
+
+    /**
+     * get facing direction
+     */
+    public get dir(): number {
+        return this._dir;
+    }
+
+    /**
+     * set facing direction
+     */
+    public set dir(n: number) {
+        this._dir = n;
+    }
+
 
     public get guardState(): string{
         return this._guardState;
@@ -58,6 +75,10 @@ export class Guard extends cc.Component {
             }
             case ('dying'):{
                 this.animationComponent.play(KLIPS.guard_death_klip);
+                //this.
+                this.animationComponent.scheduleOnce(function(){ // workaround, no animationcomplete callbacks in API.
+                    this.node.destroy();
+                },1);
                 break;
             }
 

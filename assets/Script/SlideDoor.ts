@@ -23,6 +23,8 @@ export class SlideDoor extends cc.Component {
 
     private _slideDoorOpen: boolean;
 
+    private _isBtnEnabled: boolean;
+
     /**
      * get slideDoorOpen
     */
@@ -48,6 +50,8 @@ export class SlideDoor extends cc.Component {
         return;// this._laserBeamOn;
         
     }
+    
+    
     
 
     

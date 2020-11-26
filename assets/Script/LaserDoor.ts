@@ -22,6 +22,8 @@ export class LaserDoor extends cc.Component {
     
     private _laserBeamOn: boolean;
 
+    private _isBtnEnabled: boolean;
+
     /**
      * get laserBeamOn
     */
@@ -44,6 +46,8 @@ export class LaserDoor extends cc.Component {
         return;// this._laserBeamOn;
         
     }
+
+    
 
     /**
      * addclips

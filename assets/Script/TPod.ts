@@ -22,6 +22,12 @@ export class TPod extends cc.Component {
 
     private toggleState: string = 'set';
 
+    private _scaled: number;
+
+    private timeIntegrated: number;
+
+    private blink: boolean;
+
     /** accessors
      * isEnabled is true, if hero is in suffient proximity to the switch.
      */
@@ -30,8 +36,15 @@ export class TPod extends cc.Component {
         
     }
 
-    public set isEnabled(operable: boolean){
-        this._isEnabled = operable;
+    public get scaled():number {
+        return this._scaled;
+    }
+
+    public set isEnabled(b: boolean){
+        this._isEnabled = b;
+        this.blink = true;
+        this.node.getComponent(cc.Button).enabled = this._isEnabled;
+        return;
     }
 
     //private animationComponent: cc.Animation;
@@ -62,15 +75,22 @@ export class TPod extends cc.Component {
     onLoad () {
         this.node.on(cc.Node.EventType.MOUSE_UP, function(event){
         //if(this._isEnabled)
-        if(this.node.getComponent(cc.Button).enabled)
+        if(this.isEnabled)
             this.node.dispatchEvent( new cc.Event.EventCustom(this.node.name, true) );
-        
+            this.blink = false;
+            this.node.scale = this._scaled;
+            this.timeIntegrated = 0;
         },this)
     }
 
     start () {
-
+        this._scaled = this.node.scale;
+        this.timeIntegrated = 0;
+        this.blink = false;
     }
 
-    // update (dt) {}
+    update (dt) {
+        if(this.isEnabled && this.blink) this.node.scale = .08*Math.sin(Math.PI*this.timeIntegrated)*this._scaled + this._scaled;
+        this.timeIntegrated += 10 *   dt;
+    }
 }

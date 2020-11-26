@@ -25,8 +25,10 @@ export class Hero extends cc.Component {
     //private _isOperating: boolean;
     //private _inLocomotion: boolean;
     private _speed : number;// = 5;
+    private _dir: number;
     private animSt: cc.AnimationState;
     private _heroState: string;
+    private _heroWidth: number;
 
     /**
      * get walking speed
@@ -35,43 +37,26 @@ export class Hero extends cc.Component {
         return this._speed;
     }
 
-
-    /*
     /**
-     * get heroIsEngaged - true if operating pod, false otherwise.
-     
-    public get isOperating(): boolean {
-        return this._isOperating;
-    }
-
-    public set isOperating(t: boolean){
-        this._isOperating = t; 
-        this.animSt = this.animationComponent.play(KLIPS.hero_accessing_pod_klip);
-        this.animSt.wrapMode = cc.WrapMode.Normal;
-        return;
+     * get facing direction
+     */
+    public get dir(): number {
+        return this._dir;
     }
 
     /**
-     * get inLocomotion
-     
-    public get inLocomotion(): boolean {
-        return this._inLocomotion;
-        
-    } 
+     * set facing direction
+     */
+    public set dir(n: number) {
+        this._dir = n;
+    }
+
+    public get heroWidth(): number{
+        return this._heroWidth;
+    }
+
+
     
-    public set inLocomotion(t: boolean)  {
-        this._inLocomotion = t;
-        if(this._inLocomotion){
-            this.animSt = this.animationComponent.play(KLIPS.hero_walk_klip);
-            this.animSt.wrapMode = cc.WrapMode.Loop;
-        }else{
-            this.animSt = this.animationComponent.play(KLIPS.hero_idle_klip);
-            this.animSt.wrapMode = cc.WrapMode.Loop;
-        }
-        return;
-    }
-
-    */
 
     public get heroState(): string {
         return this._heroState;
@@ -103,6 +88,26 @@ export class Hero extends cc.Component {
                     _this.heroState = 'idling' ;
                 },1);
                 console.log('HERO OPERATING ', this._heroState);
+                break;
+            }
+            case ('dying by laser'):{
+                this.animSt = this.animationComponent.play(KLIPS.hero_death_through_laser_klip);
+                this.animSt.wrapMode = cc.WrapMode.Normal;
+                console.log('Hero dying by laser');
+                this.animationComponent.scheduleOnce(function(){ // workaround, no animationcomplete callbacks in API.
+                    this.node.destroy() ;
+                },1);  
+                
+                break;
+            }
+            case ('dying by bullet'):{
+                this.animSt = this.animationComponent.play(KLIPS.hero_death_by_bullet_klip);
+                this.animSt.wrapMode = cc.WrapMode.Normal;
+                console.log('Hero dying by bullet');
+                this.animationComponent.scheduleOnce(function(){ // workaround, no animationcomplete callbacks in API.
+                    this.node.destroy() ;
+                },1);  
+                
                 break;
             }
 
@@ -140,20 +145,14 @@ export class Hero extends cc.Component {
         return;
     }
 
-    /*addEventListeners() {
-        this.node.on(CustomEvents.POD_SLIDE_DOOR_EVENT, function(event){
-            this.inLocomotion = false;
-            this.isOperating = true;
-        },this)
-
-        
-    }*/
+    
 
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
         //this._isOperating = false;//this._inLocomotion = false;//false;
         this.animationComponent = this.node.addComponent(cc.Animation);
+        this._heroWidth = this.node.width;
         //this.setHeroState('idling');
         //this._speed = 2;
         
@@ -161,9 +160,10 @@ export class Hero extends cc.Component {
 
     start () {
         this._speed = 2;
+        this._dir = 1;
         this.heroState = ''; // workaround for the animation clips loading latency issue. Unless _herostate is changed from empty to 'idling', 
-                              // which happens after clips are loaded in addclips function, update function in game class won't play any clips 
-                              // now.
+                              // which happens after clips are loaded in addclips function, mouse eventlistener function in game class won't  
+                              // play any clip now.
     }
 
     // update (dt) {}

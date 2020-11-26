@@ -40,25 +40,12 @@ const laser_door = KLIPS.laser_door_img;//'Laser beam';
 
 //``````````````````````````````````````````````````````````````````````````
 
-
-// Terminal Pods' events.
-
-const pod_slide_door_event = 'TPod1';
-const pod_laser_door_event = 'TPod2';
-
 //``````````````````````````````````````````````````````````````````````````
 
 
 @ccclass
 export default class Game extends cc.Component {
 
-    /*
-    @property(cc.Label)
-    label: cc.Label = null;
-
-    @property
-    text: string = 'hello';
-    */
 
     // Internal variables to hold references to classes from gameplay nodes' scripts.
     
@@ -117,11 +104,11 @@ export default class Game extends cc.Component {
 
     private _heroDestination: number; // clicked location xcoordinate .
     
-    private _heroStart: number; // starting x coordinate, for calculating direction.
+    private _heroStart: number; // starting x c coordinate, for calculating direction.
 
-    private _heroDir: number; // for scaling hero -1 or 1, to face left or right. This is controlled by the game manager.
+    //private _heroDir: number; // for scaling hero -1 or 1, to face left or right. This is controlled by the game manager.
 
-    private _guardDir: number; // for scaling guard -1 or 1. 
+    //private _guardDir: number; // for scaling guard -1 or 1. 
     
     // mine begin
 
@@ -272,42 +259,12 @@ export default class Game extends cc.Component {
         
         // mouse event listener registered for moving hero.
 
-
-        this.node.on(cc.Node.EventType.MOUSE_UP, function(event:cc.Event.EventMouse){
-            
-            if(_this.hero_ext.heroState == 'operating') return;
-            if(_this.hero_ext.heroState == '') return;  // workaround for the animation clips loading latency issue.
-            _this.hero_ext.heroState = 'walking';
-            this.disablePods();
-
-            console.log('HERO WALKING .................');
-            
-            _this._heroDestination = _this.node.convertToNodeSpaceAR(event.getLocation()).x;//event.getLocationX();
-            
-            _this._heroStart = _this.hero.x;
-            
-            _this._heroDir = -Math.abs(this._heroStart - this._heroDestination)/(this._heroStart - this._heroDestination);
-
-                
-            // this is to calculate if the slide door is closed, and if it is, if it falls between the hero start and destination locations.
-
-            if(!_this.slide_door_ext.slideDoorOpen){
-                let a = _this._heroStart;
-                let b = _this._heroDestination;
-                let c = _this.slide_door.x;
-
-                if(Math.abs(c-a)+Math.abs(c-b) == Math.abs(a-b))
-                    _this._heroDestination = c - _this._heroDir * _this.hero.width / 1.5; // hero confined to about the slide door
-            }
-
-
-        
-        },this)
+        this.node.on(cc.Node.EventType.MOUSE_UP, this.heroLocomotion, this);
 
         
         // listeners registered for custom events broadcast from mouse clicks on TPods.
 
-        this.node.on(CustomEvents.POD_SLIDE_DOOR_EVENT, function (event) {
+        this.node.on(CustomEvents.POD_SLIDE_DOOR_EVENT, function (event:cc.Event.EventCustom) { // the event tyoe
             console.log('slide door activated');
             _this.slide_door_ext.slideDoorOpen = !_this.slide_door_ext.slideDoorOpen;
             
@@ -317,7 +274,7 @@ export default class Game extends cc.Component {
             event.stopPropagation();
         });
 
-        this.node.on(CustomEvents.POD_LASER_DOOR_EVENT, function (event) {
+        this.node.on(CustomEvents.POD_LASER_DOOR_EVENT, function (event:cc.Event.EventCustom) {
             console.log('laser beam activated');
             _this.laser_door_ext.laserBeamOn = !_this.laser_door_ext.laserBeamOn;// && _this.slide_door_ext.slideDoorOpen;
 
@@ -330,22 +287,107 @@ export default class Game extends cc.Component {
         return;
     }
 
+    // run on mouseclick on canvas, if the hero is idling or in walking state. all other states are engaged states.
+
+    heroLocomotion(event:cc.Event.EventMouse){
+        console.log('Hero Locomotion', this);
+        
+        
+        //engaged states' conditions. ---
+
+        if(this.hero_ext.heroState == 'operating') return;
+
+        if(this.hero_ext.heroState == '') return;  // workaround for the animation clips loading latency issue.
+        
+        if(this.hero_ext.heroState == 'dying by laser') return;
+        
+        if(this.hero_ext.heroState == 'dying by bullet') return;
+
+        // ------------------------------- 
+
+        this.hero_ext.heroState = 'walking';
+        this.disablePods();
+
+        console.log('HERO WALKING .................');
+        
+        this._heroDestination = this.node.convertToNodeSpaceAR(event.getLocation()).x;//event.getLocationX();
+        
+        this._heroStart = this.hero.x;
+        
+        this.hero_ext.dir = -Math.abs(this._heroStart - this._heroDestination)/(this._heroStart - this._heroDestination);
+
+        // updating exclusive herodestinations. (Hence the return st.) 
+        // 1) two conditions checking whether hero's position is overflowing the canvas.
+        
+        if (this._heroDestination < -(this.node.width/2 - this.hero.width))  {
+            this._heroDestination = -(this.node.width/2 - this.hero.width);
+            return;
+        }
+        
+        if (this._heroDestination > (this.node.width/2 - this.hero.width))  {
+            this._heroDestination = this.node.width/2 - this.hero.width;
+            return;
+        }
+
+
+                
+        // updating exclusive herodestinations. (Hence the return st.)
+        // 2)this is to calculate if the slide door is closed, and if it is, if it falls between the hero start and destination locations.
+
+        if(!this.slide_door_ext.slideDoorOpen){
+            let a = this._heroStart;
+            let b = this._heroDestination;
+            let c = this.slide_door.x;// - this.hero.width/1.5;
+
+            
+            if(Math.abs(c - b) < this.hero_ext.heroWidth/2)
+                this._heroDestination = c -  this.hero_ext.heroWidth/2; // to confine hwero to before his half width before the door.
+
+
+            if(Math.abs(c - a)+Math.abs(c - b) == Math.abs(a - b))
+                this._heroDestination = c -  this.hero_ext.heroWidth/2; // hero confined to about the slide door
+
+            //if(Math.abs(this._heroDestination -this.hero.x) < this.hero.width)
+              //  this._herodestination
+        }
+        return;
+    }
+
     
 
     disablePods(){
-        this.tpDoor.getComponent(cc.Button).enabled = false;
-        this.tpLaser.getComponent(cc.Button).enabled = false;
+        //this.tpDoor.getComponent(cc.Button).enabled = false;
+        //this.tpLaser.getComponent(cc.Button).enabled = false;
+
+        this.tpDoor_ext.isEnabled = false;
+        this.tpLaser_ext.isEnabled = false;
                 
     }
     // initialize a few game variables that need to be.
     gameInit(){
         this._heroDestination = null;
         this._heroStart = this.node.x;
-        this.tpDoor.getComponent(cc.Button).enabled = false;
-        this.tpLaser.getComponent(cc.Button).enabled = false;
-        this._guardDir = -1;
+        //this.tpDoor.getComponent(cc.Button).enabled = false;
+        //this.tpLaser.getComponent(cc.Button).enabled = false;
+
+        this.disablePods();
+
+        //this._guardDir = -1;
+        this.guard_ext.dir = -1;
         this.addEventListeners();
 
+    }
+
+    gameOver(){
+        let _this = this;
+        cc.assetManager.loadBundle('Scene', function (err, bundle) {
+        bundle.loadScene('gameover', function(err, scene){
+            _this.destroy();
+            cc.director.runScene(scene);
+            //this.hero.destroy();
+            //this.destroy();
+            });
+        });
     }
     
     
@@ -378,12 +420,25 @@ export default class Game extends cc.Component {
             
             case ('walking'): {
 
-                // switches states between walking and idling based on this condition.
+                // contact between hero and laser, end of story. 
+                if( (Math.abs(this.hero.x - this.laser_door.x) < this.hero.width/2) && this.laser_door_ext.laserBeamOn ){
+                    this.hero_ext.heroState = 'dying by laser';
+                    this.hero.scaleX = 1.3 * this.hero_ext.dir;
+                    this.node.off(cc.Node.EventType.MOUSE_UP, this.heroLocomotion, this);
+                    //this.gameOver();
+                    let _this = this;
+                    this.schedule(function(){ // workaround, no animationcomplete callbacks in API.
+                        _this.gameOver() ;
+                    },2); 
+                    break;
+                }
                 
-                if(5 < Math.abs(this.hero.x - this._heroDestination)){ 
+                // switches states between walking and idling based on this if condition.
+
+                if(20 < Math.abs(this.hero.x - this._heroDestination)){   // check this... to how close to the mouse click the hero  moves.
                     
-                    this.hero.x +=  this._heroDir * this.hero_ext.speed;
-                    this.hero.scaleX = Math.abs(this.hero.scale) * this._heroDir;
+                    this.hero.x +=  this.hero_ext.dir * this.hero_ext.speed;
+                    this.hero.scaleX = Math.abs(this.hero.scale) * this.hero_ext.dir ;
                 }
                 else{
                     this.hero_ext.heroState = 'idling';
@@ -391,17 +446,19 @@ export default class Game extends cc.Component {
                     // Calculating hero's proximity, to be eligible to operate pods when he has come to a stop. 
                     // This is run only once when the hero enters his idle mode.
 
-                    if(Math.abs(this.hero.x - this.tpDoor.x) < 20){
+                    console.log('The hero width is ', this.hero_ext.heroWidth);
+
+                    if(Math.abs(this.hero.x - this.tpDoor.x) < 1.5 * this.hero_ext.heroWidth){
                         
                         this.tpDoor.getComponent(cc.Button).enabled = true;
-                        //this.tpDoor_ext.isEnabled = true;
+                        this.tpDoor_ext.isEnabled = true;
                     }
                     
 
-                    if(Math.abs(this.hero.x - this.tpLaser.x) < 20){
+                    if(Math.abs(this.hero.x - this.tpLaser.x) < 1.5 * this.hero_ext.heroWidth){
                         
                         this.tpLaser.getComponent(cc.Button).enabled = true;
-                        //this.tpLaser_ext.isEnabled = true;
+                        this.tpLaser_ext.isEnabled = true;
                     }
                     
                 }
@@ -418,21 +475,49 @@ export default class Game extends cc.Component {
                 break;
             }
 
+            case ('dying by laser'):{
+                break;
+            }
+
             default:{
                 break;
             }
 
         } // switch st. ends 
 
+
+
             //--------------------------------------------------------------------------------------------------------------------
         // Guard's activities
         switch(this.guard_ext.guardState){
             
             case ('patrolling'):{
+                if( ( Math.abs(this.guard.x - this.laser_door.x) < this.guard.width/2 ) && this.laser_door_ext.laserBeamOn ){
+                    this.guard_ext.guardState = 'dying';
+                    this.guard_ext.dir = -this.guard_ext.dir;
+                    this.guard.scaleX = 1.3 * this.guard_ext.dir;
+                    this.guard.y -= 10; 
+
+                    break;
+                }
+                // showdown-----------------------------------------------------------------------------------------------------------
+                if(this.slide_door_ext.slideDoorOpen && this.guard_ext.dir == -1){
+                    this.guard_ext.guardState = 'shooting';
+                    this.hero_ext.heroState = 'dying by bullet';
+                    this.hero.scaleX = -1.3 ;//* this.hero_ext.dir;
+                    this.hero.x -= 50;
+                    
+                    let _this = this;
+                    this.schedule(function(){ // workaround, no animationcomplete callbacks in API.
+                        _this.gameOver() ;
+                    },2);  
+                    //schedule this.gameOver();
+                    break;
+                }//--------------------------------------------------------------------------------------------------------------------
                 if(this.guard.x > 500 || this.guard.x < 100) // Guard moves between x c (750, 1110)
-                    this._guardDir = -this._guardDir;
-                this.guard.x += this._guardDir * this.guard_ext.speed;
-                this.guard.scaleX = 1.3 * this._guardDir;
+                    this.guard_ext.dir = -this.guard_ext.dir;
+                this.guard.x += this.guard_ext.dir * this.guard_ext.speed;
+                this.guard.scaleX = 1.3 * this.guard_ext.dir;
                 break;
             }
             case ('shooting'):{
@@ -444,7 +529,8 @@ export default class Game extends cc.Component {
             default:{
                 break;
             }
-        }
+        }// guard switch statement ends here
+
         
     } // LIFECYCLE update fn. ends
 
