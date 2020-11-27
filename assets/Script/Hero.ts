@@ -112,7 +112,7 @@ export class Hero extends cc.Component {
             }
 
             default:{
-                console.log('HERO ASTRAY ', this._heroState);
+                console.log('HERO ASTRAY ');
                 break;
 
             }

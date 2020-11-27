@@ -742,9 +742,6 @@
     "_components": [
       {
         "__id__": 17
-      },
-      {
-        "__id__": 18
       }
     ],
     "_prefab": null,
@@ -805,18 +802,6 @@
     "_enabled": true,
     "label": null,
     "text": "hello",
-    "_id": "04sH+SYRdKRJqc3TG9bhlJ"
-  },
-  {
-    "__type__": "d1e10vCKZRFqro5n2IQpDc9",
-    "_name": "",
-    "_objFlags": 0,
-    "node": {
-      "__id__": 16
-    },
-    "_enabled": true,
-    "label": null,
-    "text": "hello",
-    "_id": "5498ivx7lFc4ceUKkbi/+f"
+    "_id": "deRq8RpuFLYK97tBSkv3Pe"
   }
 ]

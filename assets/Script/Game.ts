@@ -61,6 +61,7 @@ export default class Game extends cc.Component {
     // Multiatlas from TexturePacker
     
     private atlas: cc.SpriteAtlas = null;
+    private _frames: cc.SpriteFrame[];
     
     //````````````````````````````````````````````````````````````
 
@@ -158,7 +159,8 @@ export default class Game extends cc.Component {
                     }
                 _this.atlas = atlas;
                 _this.prepareSprites();
-                console.log('The atlas is ', _this.atlas);   
+                console.log('The atlas is ', _this.atlas);
+                _this._frames =  atlas.getSpriteFrames(); 
                 
             });
             
@@ -379,15 +381,9 @@ export default class Game extends cc.Component {
     }
 
     gameOver(){
-        let _this = this;
-        cc.assetManager.loadBundle('Scene', function (err, bundle) {
-        bundle.loadScene('gameover', function(err, scene){
-            _this.destroy();
-            cc.director.runScene(scene);
-            //this.hero.destroy();
-            //this.destroy();
-            });
-        });
+        cc.director.loadScene('gameover', function(err, scene){
+            //cc.director.runScene(scene);
+        })
     }
     
     
@@ -399,6 +395,8 @@ export default class Game extends cc.Component {
         
         this.initializeRefs();
         this.loadAssets();
+        
+        cc.director.preloadScene('gameover');
         //this.addEventListeners();
 
         //this.gameInit();

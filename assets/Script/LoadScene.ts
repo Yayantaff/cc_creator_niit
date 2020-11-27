@@ -18,11 +18,17 @@ export default class NewClass extends cc.Component {
      */
     public playGame() {
        // cc.director.runScene(this.scene);
-       cc.assetManager.loadBundle('Scene', function(err, bundle){
+       /*cc.assetManager.loadBundle('Scene', function(err, bundle){
         bundle.loadScene('maingame', function(err, scene){
                 cc.director.runScene(scene);
             });
         });
+        /*cc.loader.loadRes('./Scene/maingame.fire',function(err, scene){
+            cc.director.runScene(scene);
+        })*/
+        cc.director.loadScene('maingame', function(err, scene){
+            //cc.director.runScene(scene);
+        })
         console.log('Button pressed');
         
     }
@@ -30,7 +36,7 @@ export default class NewClass extends cc.Component {
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
-        
+        cc.director.preloadScene('maingame');
     }
 
     start () {
