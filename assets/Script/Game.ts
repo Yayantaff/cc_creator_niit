@@ -17,6 +17,7 @@ import {TPod} from './TPod';
 
 import {KLIPS} from './config/Klips';
 import {CustomEvents} from './CustomEvents';
+import Globals from './Globals';
 
 //``````````````````````````````````````````````````````````````````````````
 
@@ -106,6 +107,10 @@ export default class Game extends cc.Component {
     private _heroDestination: number; // clicked location xcoordinate .
     
     private _heroStart: number; // starting x c coordinate, for calculating direction.
+
+    private _gameScore: number;
+
+    private g: Globals;
 
     //private _heroDir: number; // for scaling hero -1 or 1, to face left or right. This is controlled by the game manager.
 
@@ -262,8 +267,6 @@ export default class Game extends cc.Component {
         // mouse event listener registered for moving hero.
 
         this.node.on(cc.Node.EventType.MOUSE_UP, this.heroLocomotion, this);
-
-        
         // listeners registered for custom events broadcast from mouse clicks on TPods.
 
         this.node.on(CustomEvents.POD_SLIDE_DOOR_EVENT, function (event:cc.Event.EventCustom) { // the event tyoe
@@ -272,7 +275,16 @@ export default class Game extends cc.Component {
             
             _this.laser_door_ext.laserBeamOn = !_this.laser_door_ext.laserBeamOn  && _this.slide_door_ext.slideDoorOpen;
            
+            if (_this.hero.x != _this.tpDoor.x)
+                _this.hero_ext.dir = -(_this.hero.x - _this.tpDoor.x)/Math.abs(_this.hero.x - _this.tpDoor.x);
+            console.log('The new set hero direction is ',_this.hero_ext.dir);
+            console.log('The calcculated hero dir is ',-(_this.hero.x - _this.tpDoor.x)/Math.abs(_this.hero.x - _this.tpDoor.x));
+
             _this.hero_ext.heroState = 'operating';
+
+            /*if (_this.hero.x != _this.tpDoor.x)
+                _this.hero_ext.dir = (_this.hero.x - _this.tpDoor.x)/Math.abs(_this.hero.x - _this.tpDoor.x);*/
+        
             event.stopPropagation();
         });
 
@@ -280,7 +292,13 @@ export default class Game extends cc.Component {
             console.log('laser beam activated');
             _this.laser_door_ext.laserBeamOn = !_this.laser_door_ext.laserBeamOn;// && _this.slide_door_ext.slideDoorOpen;
 
+            if (_this.hero.x != _this.tpLaser.x)
+                _this.hero_ext.dir = -(_this.hero.x - _this.tpLaser.x)/Math.abs(_this.hero.x - _this.tpLaser.x);
             _this.hero_ext.heroState = 'operating';
+
+            /*if (_this.hero.x != _this.tpLaser.x)
+                _this.hero_ext.dir = -(_this.hero.x - _this.tpLaser.x)/Math.abs(_this.hero.x - _this.tpLaser.x);*/
+
             event.stopPropagation();
         });
         
@@ -328,6 +346,7 @@ export default class Game extends cc.Component {
         
         if (this._heroDestination > (this.node.width/2 - this.hero.width))  {
             this._heroDestination = this.node.width/2 - this.hero.width;
+            
             return;
         }
 
@@ -343,7 +362,7 @@ export default class Game extends cc.Component {
 
             
             if(Math.abs(c - b) < this.hero_ext.heroWidth/2)
-                this._heroDestination = c -  this.hero_ext.heroWidth/2; // to confine hwero to before his half width before the door.
+                this._heroDestination = c -  this.hero_ext.heroWidth/2; // to confine hero to before his half width before the door.
 
 
             if(Math.abs(c - a)+Math.abs(c - b) == Math.abs(a - b))
@@ -378,12 +397,37 @@ export default class Game extends cc.Component {
         this.guard_ext.dir = -1;
         this.addEventListeners();
 
+        
+
+        this._gameScore = 30  ;
+        this.node.getChildByName('ScoreLabel').getComponent(cc.Label).string = this._gameScore + '"';
+        this.schedule(this.scoreCounter, 1);
+
+
     }
 
-    gameOver(){
-        cc.director.loadScene('gameover', function(err, scene){
-            //cc.director.runScene(scene);
-        })
+    scoreCounter(){
+        this._gameScore -= 1;
+        this.node.getChildByName('ScoreLabel').getComponent(cc.Label).string = this._gameScore + '"';
+        console.log('Gamescore is ', this._gameScore);
+        console.log('The label is ', this.node.getChildByName('ScoreLabel'));
+        if(this._gameScore == 0) {
+            //this.gameOver(false);
+            this.unschedule(this.scoreCounter);
+            this.hero_ext.heroState ='idling';
+            this.scheduleOnce(function(){ // workaround, no animationcomplete callbacks in API.
+                this.gameOver(false) ;
+            },1);
+        }
+    }
+
+    gameOver(b: boolean){
+        Globals.score = this._gameScore;
+        Globals.won = b;
+        this.unschedule(this.scoreCounter);
+        //this.g.won = b;
+        //Window.g = this._gameScore;
+        cc.director.loadScene('gameover');
     }
     
     
@@ -395,18 +439,11 @@ export default class Game extends cc.Component {
         
         this.initializeRefs();
         this.loadAssets();
-        
-        cc.director.preloadScene('gameover');
-        //this.addEventListeners();
-
-        //this.gameInit();
-
     }           
 
     start () {
-        //this.addEventListeners();
         this.gameInit();
-        //
+        
     }
 
     update (dt) {
@@ -426,7 +463,7 @@ export default class Game extends cc.Component {
                     //this.gameOver();
                     let _this = this;
                     this.schedule(function(){ // workaround, no animationcomplete callbacks in API.
-                        _this.gameOver() ;
+                        _this.gameOver(false) ;
                     },2); 
                     break;
                 }
@@ -440,9 +477,18 @@ export default class Game extends cc.Component {
                 }
                 else{
                     this.hero_ext.heroState = 'idling';
+
+                    // this is a gameover condition. checking of the hero has managed to rech the weed.
+                    if(this.hero.x > this.node.width/2 - this.hero.width){
+                        this.scheduleOnce(function(){ // workaround, no animationcomplete callbacks in API.
+                            this.gameOver(true) ;
+                        },.5);
+                    }   
                     
                     // Calculating hero's proximity, to be eligible to operate pods when he has come to a stop. 
                     // This is run only once when the hero enters his idle mode.
+
+
 
                     console.log('The hero width is ', this.hero_ext.heroWidth);
 
@@ -507,7 +553,7 @@ export default class Game extends cc.Component {
                     
                     let _this = this;
                     this.schedule(function(){ // workaround, no animationcomplete callbacks in API.
-                        _this.gameOver() ;
+                        _this.gameOver(false) ;
                     },2);  
                     //schedule this.gameOver();
                     break;

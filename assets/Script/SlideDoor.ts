@@ -12,12 +12,7 @@ import {KLIPS} from './config/Klips';
 @ccclass
 export class SlideDoor extends cc.Component {
 
-    /*@property(cc.Label)
-    label: cc.Label = null;
-
-    @property
-    text: string = 'hello';*/
-
+    
     private animationComponent: cc.Animation;
     private animSt: cc.AnimationState;
 

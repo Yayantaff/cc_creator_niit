@@ -10,14 +10,7 @@ const {ccclass, property} = cc._decorator;
 @ccclass
 export class TPod extends cc.Component {
 
-    /*
-    @property(cc.Label)
-    label: cc.Label = null;
-
-    @property
-    text: string = 'hello';
-    */
-
+    
     private _isEnabled: boolean = false;
 
     private toggleState: string = 'set';

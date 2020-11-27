@@ -13,13 +13,7 @@ import {CustomEvents} from './CustomEvents';
 @ccclass
 export class Hero extends cc.Component {
 
-    /*
-    @property(cc.Label)
-    label: cc.Label = null;
-
-    @property
-    text: string = 'hello';*/
-
+    
     private animationComponent: cc.Animation;
 
     //private _isOperating: boolean;
@@ -49,6 +43,8 @@ export class Hero extends cc.Component {
      */
     public set dir(n: number) {
         this._dir = n;
+        this.node.scaleX = n * 1.3;
+        return;
     }
 
     public get heroWidth(): number{
@@ -86,6 +82,7 @@ export class Hero extends cc.Component {
                 let _this = this;
                 this.animationComponent.scheduleOnce(function(){ // workaround, no animationcomplete callbacks in API.
                     _this.heroState = 'idling' ;
+                    _this.dir = 1;
                 },1);
                 console.log('HERO OPERATING ', this._heroState);
                 break;
