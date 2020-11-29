@@ -9,7 +9,6 @@ This project uses Typescript.
 
 
 Source program structure: (Inside Assets/Script)
-`````````````````````````
 
 
   __                __
@@ -19,7 +18,7 @@ Source program structure: (Inside Assets/Script)
 	       |            |_____ KLIPS.ts  -> Configuration for nomenclature of images mainly. Static properties.
 	       |
 	       |
-	       |_____ Hero.ts -> Hero class, of the hero character. Adding and playing animations done from inside this class. Also speed, facing direction and state of 	        |                 activity.
+	       |_____ Hero.ts -> Hero class, of the hero character. Adding and playing animations done from inside this class. Also speed, facing direction and                  |                 state of activity.
 	       |
 	       |
 	       |_____ Guard.ts -> Hero class, of the guard character. Adding and playing animations done from inside this class. 
@@ -47,8 +46,8 @@ Source program structure: (Inside Assets/Script)
 
 
 
-Scource code installation 
-`````````````````````````
+Scource code installation:
+
 
 
 This source carries only the local system independant program assets. Following the steps below is the best way to see the code running in the Cocos Editor.
