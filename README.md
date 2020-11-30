@@ -20,7 +20,7 @@ Source program structure: (Inside Assets/Script)
 	       |            |_____ KLIPS.ts  -> Configuration for nomenclature of images mainly. Static properties.
 	       |
 	       |
-	       |_____ Hero.ts -> Hero class, of the hero character. Adding and playing animations done from inside this class. Also speed, facing direction and                  |                 state of activity.
+	       |_____ Hero.ts -> Hero class, of the hero character. Adding and playing animations done from inside this class. Also speed, facing direction and                  |                  state of activity                 |                 state of activity.
 	       |
 	       |
 	       |_____ Guard.ts -> Hero class, of the guard character. Adding and playing animations done from inside this class. 
