@@ -1,5 +1,5 @@
 `````````````````````````
-Cocos Creator NIIT
+Cocos Creator
 
 
 This is a Cocos Creator Version 2.4.2 game.
@@ -56,10 +56,10 @@ Scource code installation
 
 
 
-This source carries only the local system independant program assets. Following the steps below is the best way to see the code running in the Cocos Editor.
+This source carries only the local system independant program assets. Following the steps below is a straightforward way to see the code running in the Cocos Editor. 
 
 * Create a new 2.4.2 project in Cocos Creator.
 
-* Download the zip version of this source, extract, and copy the contents into the newly created project folder. (Replace files in the new project.)
+* Download the zip version of this source, extract, and copy the contents into the newly created project directory. (Replace files in the directory of the new project.)
 
 The editor should normally update.
